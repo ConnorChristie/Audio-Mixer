@@ -52,7 +52,7 @@ mixer.removeInput(input);
 ### `Input.new`
 ```js
 // @options - The options for this input
-let input = mixer.input(options: InputArguments);
+let input = new Input(options: InputArguments);
 
 // @channels - The number of channels this input has
 // @bitDepth - The bit depth of the data coming in this input
