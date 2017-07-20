@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "types": [
+            "node"
+        ],
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "target": "es6",
+        "allowJs": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "stripInternal": true,
+        "declaration": false,
+        "outDir": "dist",
+        "typeRoots": [
+            "node_modules/@types"
+        ]
+    },
+    "include": [
+        "src/**/*.ts"
+    ]
+}

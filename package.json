@@ -1,0 +1,31 @@
+{
+  "name": "audio-mixer",
+  "version": "1.0.0",
+  "description": "Allows mixing of PCM audio streams.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ConnorChristie/Audio-Mixer.git"
+  },
+  "keywords": [
+    "audio",
+    "mixer",
+    "stream"
+  ],
+  "author": "Connor Christie",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ConnorChristie/Audio-Mixer/issues"
+  },
+  "homepage": "https://github.com/ConnorChristie/Audio-Mixer#readme",
+  "devDependencies": {
+    "@types/node": "^8.0.14",
+    "typescript": "^2.4.2"
+  },
+  "dependencies": {
+    "underscore": "^1.8.3"
+  }
+}
