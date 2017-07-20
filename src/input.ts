@@ -13,7 +13,6 @@ export interface InputArguments extends WritableOptions {
 export class Input extends Writable {
 
     private args: InputArguments;
-    private mixer: Mixer;
 
     private buffer: Buffer;
     private sampleByteLength: number;
@@ -21,7 +20,7 @@ export class Input extends Writable {
     private readSample;
     private writeSample;
 
-    constructor(mixer: Mixer, args: InputArguments) {
+    constructor(args: InputArguments) {
         super(args);
 
         if (args.channels !== 1 && args.channels !== 2) {
@@ -66,7 +65,6 @@ export class Input extends Writable {
         }
 
         this.args = args;
-        this.mixer = mixer;
     }
 
     /**
@@ -173,10 +171,9 @@ export class Input extends Writable {
     }
 
     /**
-     * Clears the buffer and removes this input from the mixer
+     * Clears the buffer
      */
     public destroy() {
-        this.mixer.removeInput(this);
         this.buffer = new Buffer(0);
     }
 }

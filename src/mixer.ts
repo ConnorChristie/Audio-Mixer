@@ -7,7 +7,7 @@ export interface MixerArguments extends ReadableOptions {
     channels: number;
     sampleRate: number;
     bitDepth?: number;
-    clearInterval: number;
+    clearInterval?: number;
 }
 
 export class Mixer extends Readable {
@@ -93,7 +93,9 @@ export class Mixer extends Readable {
             setImmediate(this._read.bind(this));
         }
 
-        this.clearBuffers();
+        if (this.args.clearInterval) {
+            this.clearBuffers();
+        }
     }
 
     /**
@@ -101,24 +103,32 @@ export class Mixer extends Readable {
      * @param args The input's arguments
      */
     public input(args: InputArguments) {
-        let input = new Input(this, {
+        let input = new Input({
             channels: args.channels || this.args.channels,
             bitDepth: args.bitDepth || this.args.bitDepth,
             sampleRate: args.sampleRate || this.args.sampleRate,
             volume: args.volume || 100
         });
 
-        this.inputs.push(input);
+        this.addInput(input);
 
         return input;
     }
 
     /**
-     * Removed the specified input
+     * Removes the specified input
      * @param input The input
      */
-    public removeInput(input) {
+    public removeInput(input: Input) {
         this.inputs = _.without(this.inputs, input);
+    }
+
+    /**
+     * Adds the specified input to this mixer
+     * @param input The input
+     */
+    public addInput(input: Input) {
+        this.inputs.push(input);
     }
 
     /**
