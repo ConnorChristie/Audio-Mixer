@@ -1,6 +1,6 @@
 {
   "name": "audio-mixer",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Allows mixing of PCM audio streams.",
   "main": "dist/index.js",
   "scripts": {
