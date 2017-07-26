@@ -6,11 +6,10 @@
         "module": "commonjs",
         "moduleResolution": "node",
         "target": "es6",
-        "allowJs": true,
         "removeComments": true,
         "preserveConstEnums": true,
         "stripInternal": true,
-        "declaration": false,
+        "declaration": true,
         "outDir": "dist",
         "typeRoots": [
             "node_modules/@types"
