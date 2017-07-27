@@ -12,16 +12,14 @@ export interface MixerArguments extends ReadableOptions {
 
 export class Mixer extends Readable {
 
-    private args: MixerArguments;
+    protected args: MixerArguments;
+    protected inputs: Input[];
 
-    private buffer: Buffer;
-    private inputs: Input[];
+    protected sampleByteLength: number;
+    protected lastTime: number;
 
-    private sampleByteLength: number;
-    private lastTime: number;
-
-    private readSample;
-    private writeSample;
+    protected readSample;
+    protected writeSample;
 
     constructor(args: MixerArguments) {
         super(args);
@@ -34,23 +32,23 @@ export class Mixer extends Readable {
             args.sampleRate = 44100;
         }
 
-        this.buffer = new Buffer(0);
+        let buffer = new Buffer(0);
 
         if (args.bitDepth === 8) {
-            this.readSample = this.buffer.readInt8;
-            this.writeSample = this.buffer.writeInt8;
+            this.readSample = buffer.readInt8;
+            this.writeSample = buffer.writeInt8;
 
             this.sampleByteLength = 1;
         } else if (args.bitDepth === 32) {
-            this.readSample = this.buffer.readInt32LE;
-            this.writeSample = this.buffer.writeInt32LE;
+            this.readSample = buffer.readInt32LE;
+            this.writeSample = buffer.writeInt32LE;
 
             this.sampleByteLength = 4;
         } else {
             args.bitDepth = 16;
 
-            this.readSample = this.buffer.readInt16LE;
-            this.writeSample = this.buffer.writeInt16LE;
+            this.readSample = buffer.readInt16LE;
+            this.writeSample = buffer.writeInt16LE;
 
             this.sampleByteLength = 2;
         }
@@ -102,7 +100,7 @@ export class Mixer extends Readable {
      * Adds an input to this mixer
      * @param args The input's arguments
      */
-    public input(args: InputArguments) {
+    public input(args: InputArguments, channel?: number) {
         let input = new Input({
             channels: args.channels || this.args.channels,
             bitDepth: args.bitDepth || this.args.bitDepth,
@@ -110,7 +108,7 @@ export class Mixer extends Readable {
             volume: args.volume || 100
         });
 
-        this.addInput(input);
+        this.addInput(input, channel);
 
         return input;
     }
@@ -127,8 +125,12 @@ export class Mixer extends Readable {
      * Adds the specified input to this mixer
      * @param input The input
      */
-    public addInput(input: Input) {
-        this.inputs.push(input);
+    public addInput(input: Input, channel?: number) {
+        if (channel && (channel < 0 || channel >= this.args.channels)) {
+            throw new Error("Channel number out of range");
+        }
+
+        this.inputs[channel || this.inputs.length] = input;
     }
 
     /**
@@ -141,7 +143,7 @@ export class Mixer extends Readable {
     /**
      * Clears all of the input's buffers
      */
-    private clearBuffers() {
+    protected clearBuffers() {
         let now = new Date().getTime();
 
         if (now - this.lastTime >= this.args.clearInterval) {

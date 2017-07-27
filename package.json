@@ -1,6 +1,6 @@
 {
   "name": "audio-mixer",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "description": "Allows mixing of PCM audio streams.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -24,6 +24,7 @@
   "homepage": "https://github.com/ConnorChristie/Audio-Mixer#readme",
   "devDependencies": {
     "@types/node": "^8.0.14",
+    "audio-cmd-stream": "^1.0.3",
     "typescript": "^2.4.2"
   },
   "dependencies": {
