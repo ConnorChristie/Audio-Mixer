@@ -21,6 +21,8 @@ export class Mixer extends Readable {
     protected readSample;
     protected writeSample;
 
+    private static INPUT_IDLE_TIMEOUT = 250;
+
     constructor(args: MixerArguments) {
         super(args);
 
@@ -63,14 +65,7 @@ export class Mixer extends Readable {
      * Called when this stream is read from
      */
     public _read() {
-        let samples = Number.MAX_VALUE;
-
-        this.inputs.forEach((input) => {
-            let ias = input.availableSamples();
-            if (ias < samples) {
-                samples = ias;
-            }
-        });
+        let samples = this.getMaxSamples();
 
         if (samples > 0 && samples !== Number.MAX_VALUE) {
             let mixedBuffer = new Buffer(samples * this.sampleByteLength * this.args.channels);
@@ -78,11 +73,13 @@ export class Mixer extends Readable {
             mixedBuffer.fill(0);
 
             this.inputs.forEach((input) => {
-                let inputBuffer = this.args.channels === 1 ? input.readMono(samples) : input.readStereo(samples);
+                if (input.hasData) {
+                    let inputBuffer = this.args.channels === 1 ? input.readMono(samples) : input.readStereo(samples);
 
-                for (let i = 0; i < samples * this.args.channels; i++) {
-                    let sample = this.readSample.call(mixedBuffer, i * this.sampleByteLength) + Math.round(this.readSample.call(inputBuffer, i * this.sampleByteLength) / this.inputs.length);
-                    this.writeSample.call(mixedBuffer, sample, i * this.sampleByteLength);
+                    for (let i = 0; i < samples * this.args.channels; i++) {
+                        let sample = this.readSample.call(mixedBuffer, i * this.sampleByteLength) + Math.round(this.readSample.call(inputBuffer, i * this.sampleByteLength) / this.inputs.length);
+                        this.writeSample.call(mixedBuffer, sample, i * this.sampleByteLength);
+                    }
                 }
             });
 
@@ -130,6 +127,8 @@ export class Mixer extends Readable {
             throw new Error("Channel number out of range");
         }
 
+        input.setMixer(this);
+
         this.inputs[channel || this.inputs.length] = input;
     }
 
@@ -138,6 +137,31 @@ export class Mixer extends Readable {
      */
     public destroy() {
         this.inputs = [];
+    }
+
+    /**
+     * Gets the max number of samples from all inputs
+     */
+    protected getMaxSamples() {
+        let samples = Number.MAX_VALUE;
+
+        this.inputs.forEach((input) => {
+            let ias = input.availableSamples();
+
+            if (ias > 0) {
+                input.lastDataTime = new Date().getTime();
+            } else if (ias <= 0 && new Date().getTime() - input.lastDataTime >= Mixer.INPUT_IDLE_TIMEOUT) {
+                input.hasData = false;
+
+                return;
+            }
+
+            if (ias < samples) {
+                samples = ias;
+            }
+        });
+
+        return samples;
     }
 
     /**

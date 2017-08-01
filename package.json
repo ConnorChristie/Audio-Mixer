@@ -1,6 +1,6 @@
 {
   "name": "audio-mixer",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Allows mixing of PCM audio streams.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,7 +14,8 @@
   "keywords": [
     "audio",
     "mixer",
-    "stream"
+    "stream",
+    "pcm"
   ],
   "author": "Connor Christie",
   "license": "ISC",

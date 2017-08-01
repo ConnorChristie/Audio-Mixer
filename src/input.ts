@@ -12,6 +12,7 @@ export interface InputArguments extends WritableOptions {
 
 export class Input extends Writable {
 
+    private mixer: Mixer;
     private args: InputArguments;
 
     private buffer: Buffer;
@@ -19,6 +20,9 @@ export class Input extends Writable {
 
     private readSample;
     private writeSample;
+
+    public hasData: boolean;
+    public lastDataTime: number;
 
     constructor(args: InputArguments) {
         super(args);
@@ -65,6 +69,11 @@ export class Input extends Writable {
         }
 
         this.args = args;
+        this.hasData = false;
+    }
+
+    public setMixer(mixer: Mixer) {
+        this.mixer = mixer;
     }
 
     /**
@@ -143,6 +152,10 @@ export class Input extends Writable {
      * The method that gets called when this stream is being written to
      */
     public _write(chunk, encoding, next) {
+        if (!this.hasData) {
+            this.hasData = true;
+        }
+
         this.buffer = Buffer.concat([this.buffer, chunk]);
         next();
     }

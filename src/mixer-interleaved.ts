@@ -10,14 +10,7 @@ export class InterleavedMixer extends Mixer {
      * Called when this stream is read from
      */
     public _read() {
-        let samples = Number.MAX_VALUE;
-
-        this.inputs.forEach((input) => {
-            let ias = input.availableSamples();
-            if (ias < samples) {
-                samples = ias;
-            }
-        });
+        let samples = this.getMaxSamples();
 
         if (samples > 0 && samples !== Number.MAX_VALUE) {
             let mixedBuffer = new Buffer(samples * this.sampleByteLength * this.args.channels);
@@ -27,7 +20,7 @@ export class InterleavedMixer extends Mixer {
             for (let c = 0; c < this.args.channels; c++) {
                 let input = this.inputs[c];
 
-                if (input !== undefined) {
+                if (input !== undefined && input.hasData) {
                     let inputBuffer = input.readMono(samples);
 
                     for (let i = 0; i < samples; i++) {
