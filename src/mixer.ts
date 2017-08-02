@@ -156,7 +156,7 @@ export class Mixer extends Readable {
                 return;
             }
 
-            if (ias < samples) {
+            if (input.hasData && ias < samples) {
                 samples = ias;
             }
         });
