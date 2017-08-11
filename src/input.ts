@@ -8,6 +8,7 @@ export interface InputArguments extends WritableOptions {
     bitDepth?: number;
     sampleRate?: number;
     volume?: number;
+    clearInterval?: number;
 }
 
 export class Input extends Writable {
@@ -22,7 +23,9 @@ export class Input extends Writable {
     private writeSample;
 
     public hasData: boolean;
+
     public lastDataTime: number;
+    public lastClearTime: number;
 
     constructor(args: InputArguments) {
         super(args);
@@ -70,6 +73,8 @@ export class Input extends Writable {
 
         this.args = args;
         this.hasData = false;
+
+        this.lastClearTime = new Date().getTime();
     }
 
     public setMixer(mixer: Mixer) {
@@ -178,9 +183,15 @@ export class Input extends Writable {
     /**
      * Clears the buffer but keeps 1024 samples still in the buffer to avoid a possible empty buffer
      */
-    public clear() {
-        let length = 1024 * (this.args.bitDepth / 8) * this.args.channels;
-        this.buffer = this.buffer.slice(0, length);
+    public clear(force?: boolean) {
+        let now = new Date().getTime();
+
+        if (force || (this.args.clearInterval && now - this.lastClearTime >= this.args.clearInterval)) {
+            let length = 1024 * (this.args.bitDepth / 8) * this.args.channels;
+            this.buffer = this.buffer.slice(0, length);
+
+            this.lastClearTime = now;
+        }
     }
 
     /**

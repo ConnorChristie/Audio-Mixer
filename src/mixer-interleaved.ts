@@ -36,8 +36,6 @@ export class InterleavedMixer extends Mixer {
             setImmediate(this._read.bind(this));
         }
 
-        if (this.args.clearInterval) {
-            this.clearBuffers();
-        }
+        this.clearBuffers();
     }
 }

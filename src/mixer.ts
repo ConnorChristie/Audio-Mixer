@@ -7,7 +7,6 @@ export interface MixerArguments extends ReadableOptions {
     channels: number;
     sampleRate: number;
     bitDepth?: number;
-    clearInterval?: number;
 }
 
 export class Mixer extends Readable {
@@ -16,7 +15,6 @@ export class Mixer extends Readable {
     protected inputs: Input[];
 
     protected sampleByteLength: number;
-    protected lastTime: number;
 
     protected readSample;
     protected writeSample;
@@ -56,9 +54,7 @@ export class Mixer extends Readable {
         }
 
         this.args = args;
-
         this.inputs = [];
-        this.lastTime = new Date().getTime();
     }
 
     /**
@@ -88,9 +84,7 @@ export class Mixer extends Readable {
             setImmediate(this._read.bind(this));
         }
 
-        if (this.args.clearInterval) {
-            this.clearBuffers();
-        }
+        this.clearBuffers();
     }
 
     /**
@@ -102,7 +96,8 @@ export class Mixer extends Readable {
             channels: args.channels || this.args.channels,
             bitDepth: args.bitDepth || this.args.bitDepth,
             sampleRate: args.sampleRate || this.args.sampleRate,
-            volume: args.volume || 100
+            volume: args.volume || 100,
+            clearInterval: args.clearInterval
         });
 
         this.addInput(input, channel);
@@ -168,14 +163,8 @@ export class Mixer extends Readable {
      * Clears all of the input's buffers
      */
     protected clearBuffers() {
-        let now = new Date().getTime();
-
-        if (now - this.lastTime >= this.args.clearInterval) {
-            this.inputs.forEach((input) => {
-                input.clear();
-            });
-
-            this.lastTime = now;
-        }
+        this.inputs.forEach((input) => {
+            input.clear();
+        });
     }
 }
