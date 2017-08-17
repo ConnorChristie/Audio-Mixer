@@ -24,10 +24,6 @@ export class Mixer extends Readable {
     constructor(args: MixerArguments) {
         super(args);
 
-        if (args.channels !== 1 && args.channels !== 2) {
-            args.channels = 2;
-        }
-
         if (args.sampleRate < 1) {
             args.sampleRate = 44100;
         }
@@ -73,7 +69,7 @@ export class Mixer extends Readable {
                     let inputBuffer = this.args.channels === 1 ? input.readMono(samples) : input.readStereo(samples);
 
                     for (let i = 0; i < samples * this.args.channels; i++) {
-                        let sample = this.readSample.call(mixedBuffer, i * this.sampleByteLength) + Math.round(this.readSample.call(inputBuffer, i * this.sampleByteLength) / this.inputs.length);
+                        let sample = this.readSample.call(mixedBuffer, i * this.sampleByteLength) + Math.floor(this.readSample.call(inputBuffer, i * this.sampleByteLength) / this.inputs.length);
                         this.writeSample.call(mixedBuffer, sample, i * this.sampleByteLength);
                     }
                 }

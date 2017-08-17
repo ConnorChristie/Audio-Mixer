@@ -95,7 +95,7 @@ export class Input extends Writable {
         this.buffer = this.buffer.slice(bytes);
 
         for (let i = 0; i < sample.length; i += 2) {
-            sample.writeInt16LE(Math.round(this.args.volume * sample.readInt16LE(i) / 100), i);
+            sample.writeInt16LE(Math.floor(this.args.volume * sample.readInt16LE(i) / 100), i);
         }
 
         return sample;
@@ -116,7 +116,7 @@ export class Input extends Writable {
             let l = this.readSample.call(stereoBuffer, i * this.sampleByteLength * 2);
             let r = this.readSample.call(stereoBuffer, (i * this.sampleByteLength * 2) + this.sampleByteLength);
 
-            this.writeSample.call(monoBuffer, Math.round((l + r) / 2), i * this.sampleByteLength);
+            this.writeSample.call(monoBuffer, Math.floor((l + r) / 2), i * this.sampleByteLength);
         }
 
         return monoBuffer;
