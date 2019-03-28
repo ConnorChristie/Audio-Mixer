@@ -18,7 +18,7 @@ export class Mixer extends Readable {
 
     protected readSample;
     protected writeSample;
-    protected needReadable: boolean;
+    protected needReadable: boolean = true;
 
     private static INPUT_IDLE_TIMEOUT = 250;
     private _timer:any = null
