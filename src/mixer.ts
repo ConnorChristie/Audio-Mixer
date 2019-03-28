@@ -21,7 +21,7 @@ export class Mixer extends Readable {
     protected needReadable: boolean;
 
     private static INPUT_IDLE_TIMEOUT = 250;
-    private _timer = null
+    private _timer:any = null
 
     constructor(args: MixerArguments) {
         super(args);
