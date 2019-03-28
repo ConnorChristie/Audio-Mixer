@@ -18,8 +18,10 @@ export class Mixer extends Readable {
 
     protected readSample;
     protected writeSample;
+    protected needReadable: boolean;
 
     private static INPUT_IDLE_TIMEOUT = 250;
+    private _timer = null
 
     constructor(args: MixerArguments) {
         super(args);
@@ -76,8 +78,9 @@ export class Mixer extends Readable {
             });
 
             this.push(mixedBuffer);
-        } else {
-            setImmediate(this._read.bind(this));
+        } else if(this.needReadable) {
+            clearImmediate(this._timer)
+            this._timer = setImmediate(this._read.bind(this));
         }
 
         this.clearBuffers();
@@ -128,6 +131,10 @@ export class Mixer extends Readable {
      */
     public destroy() {
         this.inputs = [];
+    }
+
+    public close(){
+        this.needReadable = false
     }
 
     /**
